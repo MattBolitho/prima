@@ -16,3 +16,33 @@ git2 = "0.19"
 
 [lib]
 doctest = false
+
+[[example]]
+name = "bobyqa"
+path = "examples/bobyqa.rs"
+test = true
+harness = false
+
+[[example]]
+name = "cobyla"
+path = "examples/cobyla.rs"
+test = true
+harness = false
+
+[[example]]
+name = "lincoa"
+path = "examples/lincoa.rs"
+test = true
+harness = false
+
+[[example]]
+name = "newuoa"
+path = "examples/newuoa.rs"
+test = true
+harness = false
+
+[[example]]
+name = "uobyqa"
+path = "examples/uobyqa.rs"
+test = true
+harness = false

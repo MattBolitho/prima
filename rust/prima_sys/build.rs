@@ -27,10 +27,19 @@ fn main() {
     builder.clone("https://github.com/libprima/prima", &prima_clone_path)
         .expect("Failed to clone PRIMA.");
 
-    // Build PRIMA with CMake.
-    let dst = cmake::Config::new(&prima_clone_path).build();
-    println!("cargo:rustc-link-search=native={}", dst.display());
+    // Build the PRIMA library with CMake.
+    let dst = cmake::Config::new(&prima_clone_path)
+        .build();
+
+    // Delete the cloned PRIMA repository after building the library.
+    // Otherwise we will get errors in subsequent builds when git clone
+    // tries to clone into a directory that already exists.
+    std::fs::remove_dir_all(&prima_clone_path)
+        .expect("Failed to delete cloned prima repository after build.");
+
+    println!("cargo:rustc-link-search=native={}/lib", dst.display());
     println!("cargo:rustc-link-lib=primac");
+    println!("cargo:rustc-link-lib=primaf");
 
     let bindings = bindgen::Builder::default()
         .header("prima_bindgen.h")
