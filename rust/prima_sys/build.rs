@@ -1,5 +1,14 @@
 //! Generates the C bindings for the PRIMA C interface.
 
+#[cfg(feature = "gfortran")]
+const FORTRAN_LIB: &str = "gfortran";
+
+#[cfg(feature = "flang")]
+const FORTRAN_LIB: &str = "flang";
+
+#[cfg(feature = "intel")]
+const FORTRAN_LIB: &str = "ifcore";
+
 fn main() {
     // Skip building the bindings if we are on docs.rs, otherwise we
     // will get build failures because their images won't contain our
@@ -42,7 +51,7 @@ fn main() {
     println!("cargo:rustc-link-lib=primaf");
 
     // todo - make configurable
-    println!("cargo:rustc-link-lib=gfortran");
+    println!("cargo:rustc-link-lib={}", FORTRAN_LIB);
 
     let bindings = bindgen::Builder::default()
         .header("prima_bindgen.h")

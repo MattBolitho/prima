@@ -9,6 +9,12 @@ license = "BSD-3-Clause"
 keywords = ["PRIMA", "optimization", "ffi", "bindings"]
 categories = ["external-ffi-bindings", "mathematics", "science"]
 
+[features]
+default = ["gfortran"]
+gfortran = []
+flang = []
+intel = []
+
 [build-dependencies]
 bindgen = "0.70"
 cmake = "0.1"
