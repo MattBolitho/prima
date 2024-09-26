@@ -1,12 +1,13 @@
 //! Example of using the COBYLA optimization algorithm.
 
 use prima_sys::*;
+use std::os::raw::{c_int, c_void};
 
 unsafe extern "C" fn objective_and_constraints(
     x: *const f64,
     f: *mut f64,
     constr: *mut f64,
-    _data: *const ::std::os::raw::c_void) {
+    _data: *const c_void) {
     let x = std::slice::from_raw_parts(x, 2);
     let x1 = x[0];
     let x2 = x[1];
@@ -17,13 +18,13 @@ unsafe extern "C" fn objective_and_constraints(
 }
 
 unsafe extern "C" fn intermediate(
-    n: ::std::os::raw::c_int,
+    n: c_int,
     x: *const f64,
     f: f64,
-    nf: ::std::os::raw::c_int,
-    _tr: ::std::os::raw::c_int,
+    nf: c_int,
+    _tr: c_int,
     _cstrv: f64,
-    _m_nlcon: ::std::os::raw::c_int,
+    _m_nlcon: c_int,
     _nlconstr: *const f64,
     terminate: *mut bool,
 ) -> () {

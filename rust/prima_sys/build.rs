@@ -1,5 +1,4 @@
-//! Generates the C bindings for the PRIMA derivative-free optimization
-//! library at build time.
+//! Generates the C bindings for the PRIMA C interface.
 
 fn main() {
     // Skip building the bindings if we are on docs.rs, otherwise we
@@ -29,6 +28,7 @@ fn main() {
 
     // Build the PRIMA library with CMake.
     let dst = cmake::Config::new(&prima_clone_path)
+        .define("BUILD_SHARED_LIBS", "ON")
         .build();
 
     // Delete the cloned PRIMA repository after building the library.
@@ -41,14 +41,17 @@ fn main() {
     println!("cargo:rustc-link-lib=primac");
     println!("cargo:rustc-link-lib=primaf");
 
+    // todo - make configurable
+    println!("cargo:rustc-link-lib=gfortran");
+
     let bindings = bindgen::Builder::default()
         .header("prima_bindgen.h")
         .clang_arg(format!("-I{}", dst.join("include").display()))
         .generate()
-        .expect("Unable to generate PRIMA C bindings.");
+        .expect("Failed to generate PRIMA C bindings.");
 
     // Write the bindings to the $OUT_DIR/bindings.rs file.
     bindings
         .write_to_file(out_path.join("bindings.rs"))
-        .expect("Couldn't write PRIMA C bindings!");
+        .expect("Failed to write PRIMA C bindings to file.");
 }
