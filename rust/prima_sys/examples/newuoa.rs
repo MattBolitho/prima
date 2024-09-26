@@ -38,34 +38,24 @@ fn main() -> () {
     let objective_callback: prima_obj_t = Some(objective);
     let intermediate_callback: prima_callback_t = Some(intermediate);
 
-    let mut uninit_problem = std::mem::MaybeUninit::<prima_problem_t>::uninit();
-    let mut uninit_options = std::mem::MaybeUninit::<prima_options_t>::uninit();
-    let mut uninit_result = std::mem::MaybeUninit::<prima_result_t>::uninit();
+    let mut problem = new_problem(number_of_variables);
+    problem.x0 = initial_variables.as_mut_ptr();
+    problem.calfun = objective_callback;
 
-    unsafe {
-        let uninit_problem_ptr = uninit_problem.as_mut_ptr();
-        let uninit_options_ptr = uninit_options.as_mut_ptr();
-        let uninit_result_ptr = uninit_result.as_mut_ptr();
+    let mut options = new_options();
+    options.iprint = prima_message_t_PRIMA_MSG_EXIT as i32;
+    options.maxfun = 500 * number_of_variables;
+    options.rhoend = 1e-6;
+    options.callback = intermediate_callback;
 
-        prima_init_problem(uninit_problem_ptr, number_of_variables);
-        (*uninit_problem_ptr).x0 = initial_variables.as_mut_ptr();
-        (*uninit_problem_ptr).calfun = objective_callback;
-
-        prima_init_options(uninit_options_ptr);
-        (*uninit_options_ptr).iprint = prima_message_t_PRIMA_MSG_EXIT as i32;
-        (*uninit_options_ptr).maxfun = 500 * number_of_variables;
-        (*uninit_options_ptr).rhoend = 1e-6;
-        (*uninit_options_ptr).callback = intermediate_callback;
-
-        let problem = uninit_problem.assume_init();
-        let options = uninit_options.assume_init();
-
-        let _return_code = prima_minimize(
+    let mut result = prima_result_t::default();
+    let result_ptr = std::ptr::addr_of_mut!(result);
+    let _ = unsafe {
+        prima_minimize(
             prima_algorithm_t_PRIMA_NEWUOA,
             problem,
             options,
-            uninit_result_ptr);
-
-        prima_free_result(uninit_result_ptr);
-    }
+            result_ptr);
+    };
+    unsafe { prima_free_result(result_ptr); }
 }
